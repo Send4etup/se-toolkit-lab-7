@@ -88,6 +88,20 @@ services:
       - ${LMS_API_HOST_ADDRESS:?'LMS_API_HOST_ADDRESS is required'}:${LMS_API_HOST_PORT:?'LMS_API_HOST_PORT is required'}:${CADDY_CONTAINER_PORT}
     volumes:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+  bot:
+    build: ./bot
+    restart: unless-stopped
+    networks:
+      - lms-network
+    env_file:
+      - .env.docker.secret
+    environment:
+      - LMS_API_URL=http://backend:42002
+      - LLM_API_BASE_URL=http://host.docker.internal:42005
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:
